@@ -8,6 +8,7 @@
 using namespace std;
 
 class AbstractCpmCommand {
+    
     public:
 
         enum class Result {
@@ -18,7 +19,6 @@ class AbstractCpmCommand {
         };
 
         struct Request {
-            Request();
             virtual vector<string> toStringVector();
         };
 
@@ -30,8 +30,6 @@ class AbstractCpmCommand {
         virtual Request* request() = 0;
         virtual Response* response() = 0; 
         virtual void execute() = 0;
-
-    public:
 
         static uint registrationID;
 

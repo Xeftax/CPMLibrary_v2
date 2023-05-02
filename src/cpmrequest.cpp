@@ -18,7 +18,7 @@ void AbstractCpmCommand::Response::fromStringVector(vector<string> response) {
     status = static_cast<Result>(stoi(response[0]));
 }
 
-Select::Select(string& folderName) : mRequest{folderName} {}
+Select::Select(string& folderName) { mRequest.folderName = folderName; }
 uint Select::registrationID = CpmDialog::commandRegister<Select,string>(1);
 
 vector<string> Select::Request::toStringVector() {
@@ -42,5 +42,7 @@ Select::Response* Select::response() {
 }
 
 void Select::execute() {
-    mResponse = Response{Result::OK, 324536, 856};
+    mResponse.status = Result::OK;
+    mResponse.UIDVALIDITY = 765897;
+    mResponse.nextUID = 345;
 }

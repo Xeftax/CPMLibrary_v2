@@ -13,21 +13,21 @@ class IDialogQueue {
     public:
         virtual ~IDialogQueue();
         virtual string pop() = 0;
-        virtual void add(string) = 0;
+        virtual void add(string message) = 0;
         virtual bool isEmpty() = 0;
 };
 
 class IRequestCoder {
     public :
         virtual ~IRequestCoder();
-        virtual string code(vector<string>) = 0;
-        virtual vector<string> decode(string) = 0;
+        virtual string code(vector<string> message) = 0;
+        virtual vector<string> decode(string message) = 0;
 };
 
 class IUIDGenerator {
     public:
         virtual ~IUIDGenerator();
-        virtual string getNewUID();
+        virtual string getNewUID() = 0;
 };
 
 class CpmDialog {
