@@ -21,9 +21,10 @@ class debugTestSuite : public CxxTest::TestSuite {
             shared_ptr<TestDialogQueue> receiverQueue = make_shared<TestDialogQueue>();
             CpmDialog cpmdialog1(senderQueue,receiverQueue,make_shared<TestRequestCoder>(),make_shared<TestUIDGenerator>());
             CpmDialog cpmdialog2(receiverQueue,senderQueue,make_shared<TestRequestCoder>(),make_shared<TestUIDGenerator>());
+            cpmdialog1.startDialog();
+            cpmdialog2.startDialog();
             string folderName = "babine";
-            shared_ptr<Select> request = make_shared<Select>(folderName);
-            cpmdialog1.sendRequest(request);
-            cout << request->response() << endl;
+            shared_ptr<Select> request = cpmdialog1.sendRequest<Select>(folderName);
+            cout << static_cast<int>(request->response()->status) << endl << request->response()->UIDVALIDITY << endl << request->response()->nextUID << endl;
         }
 };

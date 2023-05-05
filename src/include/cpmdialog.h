@@ -9,6 +9,9 @@
 #include <map>
 #include <vector>
 #include <functional>
+#include <chrono>
+#include <thread>
+
 
 class IDialogQueue {
     public:
@@ -57,9 +60,27 @@ class CpmDialog {
         virtual void startDialog();
         virtual void stopDialog();
 
-        void sendRequest(shared_ptr<AbstractCpmCommand> cpmCommand);
-        template<typename T, typename... Args>
-        shared_ptr<T> sendRequest(Args&&... args);
+        template<typename CpmCommand>
+        void sendRequest(shared_ptr<CpmCommand> cpmCommand) {
+            vector<string> request = cpmCommand->request()->toStringVector();
+            vector<string> requestUID = {mUIDGenerator->getNewUID(),to_string(CpmCommand::registrationID)};
+            request.insert(request.begin(),requestUID.begin(),requestUID.end());
+            mSenderQueue->add(mRequestCoder->code(request));
+            pendingRequests.insert(make_pair(requestUID.front(), cpmCommand));
+            chrono::milliseconds requestTimeout = mRequestTimeout;
+            while (cpmCommand->response()->status == AbstractCpmCommand::Result::NONE && requestTimeout > chrono::milliseconds(0)) {
+                this_thread::sleep_for(mRefreshPeriod);
+                requestTimeout += -mRefreshPeriod;
+            }
+            if (requestTimeout <= chrono::milliseconds(0)) throw "";
+        }
+
+        template<typename CpmCommand, typename... Args>
+        shared_ptr<CpmCommand> sendRequest(Args&&... args) {
+            shared_ptr<CpmCommand> cpmRequest = make_shared<CpmCommand>(forward<Args>(args)...);
+            sendRequest<CpmCommand>(cpmRequest);
+            return cpmRequest;
+        }
 
         template<typename T, size_t ArgsNumber>
         static uint commandRegister(uint commandID) {
@@ -75,6 +96,7 @@ class CpmDialog {
     protected:
 
         bool isDialoguing;
+        thread listening_thread;
         map<string,weak_ptr<AbstractCpmCommand>> pendingRequests;
 
         template <typename... Args>

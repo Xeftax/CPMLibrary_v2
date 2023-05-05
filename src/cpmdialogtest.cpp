@@ -1,6 +1,7 @@
 #include "cpmdialogtest.h"
 #include <random>
 #include <iomanip>
+#include <sstream>
 
 string TestDialogQueue::pop() { 
     string result = mQueue.front();
@@ -14,7 +15,6 @@ bool TestDialogQueue::isEmpty() { return mQueue.empty(); }
 string TestRequestCoder::code(vector<string> message) {
     stringstream ss;
     for (const auto& msg : message) { ss << msg.length() << ':' << msg;}
-    ss << "0:";
     return ss.str();
 }
 vector<string> TestRequestCoder::decode(string message) {

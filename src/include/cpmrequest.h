@@ -34,7 +34,7 @@ class AbstractCpmCommand {
         virtual void execute() = 0;
 
         static uint registrationID;
-
+        uint getRegistrationID();
 };
 
 class Select : public AbstractCpmCommand {

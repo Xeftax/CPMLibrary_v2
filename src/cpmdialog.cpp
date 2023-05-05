@@ -6,8 +6,6 @@
 #include <stdexcept>
 #include <string>
 #include <sys/types.h>
-#include <thread>
-#include <chrono>
 #include <random>
 #include <utility>
 #include <tuple>
@@ -24,8 +22,9 @@ CpmDialog::~CpmDialog() { stopDialog(); }
 
 void CpmDialog::startDialog() {
     isDialoguing = true;
-    while (isDialoguing) {
-        if (!mReceiverQueue->isEmpty()) {
+    listening_thread = thread([this]() {
+        while (isDialoguing) {
+            if (!mReceiverQueue->isEmpty()) {
             vector<string> message = mRequestCoder->decode(mReceiverQueue->pop());
             string messageUID = message[0];
             auto pendingRequestIterator = pendingRequests.find(messageUID);
@@ -41,29 +40,14 @@ void CpmDialog::startDialog() {
             }
         }
         this_thread::sleep_for(mRefreshPeriod);
-    }
+        }
+    });
 }
 
 void CpmDialog::stopDialog() {
     isDialoguing = false;
-}
-
-template<typename T, typename... Args>
-shared_ptr<T> CpmDialog::sendRequest(Args&&... args){
-    static_assert(is_base_of<AbstractCpmCommand, T>::value, "Type must derive from ICpmRequest");
-    shared_ptr<T> cpmRequest = shared_ptr<T>(new T(forward<Args>(args)...));
-    sendRequest(cpmRequest);
-    return cpmRequest;
-}
-
-void CpmDialog::sendRequest(shared_ptr<AbstractCpmCommand> cpmCommand) {
-    vector<string> request = cpmCommand->request()->toStringVector();
-    vector<string> requestUID = {mUIDGenerator->getNewUID(),to_string(cpmCommand->registrationID)};
-    request.insert(request.begin(),requestUID.begin(),request.end());
-    mSenderQueue->add(mRequestCoder->code(request));
-    pendingRequests.insert(make_pair(requestUID.front(), cpmCommand));
-    while (cpmCommand->response()->status == AbstractCpmCommand::Result::NONE) {
-        this_thread::sleep_for(mRefreshPeriod);
+    if (listening_thread.joinable()) {
+        listening_thread.join();
     }
 }
 

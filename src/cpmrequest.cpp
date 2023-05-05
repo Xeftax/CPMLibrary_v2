@@ -9,6 +9,7 @@
 #include <vector>
 
 uint AbstractCpmCommand::registrationID = 0;
+uint AbstractCpmCommand::getRegistrationID() { return registrationID;}
 
 vector<string> AbstractCpmCommand::Request::toStringVector() { return vector<string>();}
 
@@ -24,8 +25,6 @@ void AbstractCpmCommand::Response::fromStringVector(vector<string> response) {
 
 Select::Select(string& folderName) { mRequest.folderName = folderName; }
 uint Select::registrationID = CpmDialog::commandRegister<Select,1>(1) ;
-
-
 
 vector<string> Select::Request::toStringVector() {
     vector<string> request = AbstractCpmCommand::Request::toStringVector();
