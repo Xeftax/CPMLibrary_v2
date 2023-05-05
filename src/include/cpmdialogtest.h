@@ -1,3 +1,6 @@
+#ifndef CPM_DIALOG_TEST
+#define CPM_DIALOG_TEST
+
 #include "cpmdialog.h"
 #include <deque>
 
@@ -20,3 +23,5 @@ class TestUIDGenerator : public IUIDGenerator {
     public:
         virtual string getNewUID();
 };
+
+#endif

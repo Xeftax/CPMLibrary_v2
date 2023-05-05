@@ -20,10 +20,12 @@ class AbstractCpmCommand {
 
         struct Request {
             virtual vector<string> toStringVector();
+            virtual void fromStringVector(vector<string> response);
         };
 
         struct Response {
             Result status = Result::NONE;
+            virtual vector<string> toStringVector();
             virtual void fromStringVector(vector<string> response);
         };
 
@@ -42,11 +44,14 @@ class Select : public AbstractCpmCommand {
         struct Request : AbstractCpmCommand::Request {
             string folderName;
             virtual vector<string> toStringVector();
+            virtual void fromStringVector(vector<string> response);
+
         };
 
         struct Response : AbstractCpmCommand::Response {
             uint32_t UIDVALIDITY;
             uint32_t nextUID;
+            virtual vector<string> toStringVector();
             virtual void fromStringVector(vector<string> response);
         };
 

@@ -13,7 +13,9 @@
 #include <tuple>
 #include <vector>
 
-
+IDialogQueue::~IDialogQueue() {}
+IRequestCoder::~IRequestCoder() {}
+IUIDGenerator::~IUIDGenerator() {}
 
 CpmDialog::CpmDialog(shared_ptr<IDialogQueue> senderQueue, shared_ptr<IDialogQueue> receiverQueue, shared_ptr<IRequestCoder> requestCoder, shared_ptr<IUIDGenerator> uidGenerator, chrono::milliseconds refreshPeriod, chrono::milliseconds requestTimeout) 
     : mSenderQueue(senderQueue), mReceiverQueue(receiverQueue), mRequestCoder(requestCoder), mUIDGenerator(uidGenerator), mRefreshPeriod(refreshPeriod), mRequestTimeout(requestTimeout) {}
@@ -25,13 +27,17 @@ void CpmDialog::startDialog() {
     while (isDialoguing) {
         if (!mReceiverQueue->isEmpty()) {
             vector<string> message = mRequestCoder->decode(mReceiverQueue->pop());
-            auto pendingRequestIterator = pendingRequests.find(message.front());
+            string messageUID = message[0];
+            auto pendingRequestIterator = pendingRequests.find(messageUID);
             if (pendingRequestIterator != pendingRequests.end()) {
                 if (shared_ptr<AbstractCpmCommand> pendingRequest = pendingRequestIterator->second.lock())
                     pendingRequest->response()->fromStringVector(vector<string> {message.begin() + 1, message.end()});
             } else {
                 shared_ptr<AbstractCpmCommand> request = createCommand(stoul(message[1]), vector<string>(message.begin() + 2, message.end()));
                 request->execute();
+                vector<string> response = request->response()->toStringVector();
+                response.insert(response.begin(),messageUID);
+                mSenderQueue->add(mRequestCoder->code(response));
             }
         }
         this_thread::sleep_for(mRefreshPeriod);
@@ -67,27 +73,6 @@ shared_ptr<AbstractCpmCommand> CpmDialog::createCommand(uint commandID, vector<s
     if (createFuncIterator == registeredCommand.end()) 
         throw range_error("There is no concrete CpmCommand registered in CpmDialog with the id : \""+to_string(commandID) +"\"");
     return createFuncIterator->second(argsVect);
-}
-
-template<size_t... S>
-void unpack_vector(const vector<string>& vec, index_sequence<S...>) {
-    test2(vec[S]...);
-}
-
-template<size_t size>
-void unpack_vector(const vector<string>& vec) {
-    if (vec.size() != size) throw /* choose your error */;
-    unpack_vector(vec, make_index_sequence<size>());
-}
-
-template<typename T, typename... Args>
-uint CpmDialog::commandRegister(uint commandID) {
-    static_assert(is_base_of<AbstractCpmCommand, T>::value, "Class must be derived from AbstractCpmCommand");
-    bool result = registeredCommand.insert(make_pair(commandID, [] (vector<string> args) -> shared_ptr<AbstractCpmCommand> {
-        return make_shared<T>(unpack_vector<sizeof...(Args)>(args));
-    }))->second;
-    if (result == false) throw invalid_argument("A CpmCommand is already registered with this id : \""+to_string(commandID) +"\"");
-    return commandID;
 }
 
 map<uint, function<shared_ptr<AbstractCpmCommand>(vector<string>)>> CpmDialog::registeredCommand;

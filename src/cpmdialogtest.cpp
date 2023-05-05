@@ -11,7 +11,7 @@ void TestDialogQueue::add(string message) { mQueue.push_back(message); }
 bool TestDialogQueue::isEmpty() { return mQueue.empty(); }
 
 
-string TestRequestCoder ::code(vector<string> message) {
+string TestRequestCoder::code(vector<string> message) {
     stringstream ss;
     for (const auto& msg : message) { ss << msg.length() << ':' << msg;}
     ss << "0:";

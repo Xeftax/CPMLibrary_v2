@@ -2,6 +2,7 @@
 #define CPM_DIALOG
 
 #include "cpmrequest.h"
+#include <cstddef>
 #include <memory>
 #include <chrono>
 #include <set>
@@ -30,6 +31,19 @@ class IUIDGenerator {
         virtual string getNewUID() = 0;
 };
 
+namespace unpack_vector {
+    template<typename T, size_t... S>
+    static shared_ptr<AbstractCpmCommand> make_shared(vector<string>& vec, index_sequence<S...>) {
+        return std::make_shared<T>(vec[S]...);
+    }
+
+    template<typename T, size_t size>
+    static shared_ptr<AbstractCpmCommand> make_shared(vector<string>& vec) {
+        if (vec.size() != size) throw /* choose your error */;
+        return make_shared<T>(vec, make_index_sequence<size>());
+    }
+}
+
 class CpmDialog {
 
     public:
@@ -47,16 +61,21 @@ class CpmDialog {
         template<typename T, typename... Args>
         shared_ptr<T> sendRequest(Args&&... args);
 
-        template<typename T, typename... Args>
-        static uint commandRegister(uint commandID);
+        template<typename T, size_t ArgsNumber>
+        static uint commandRegister(uint commandID) {
+            static_assert(is_base_of<AbstractCpmCommand, T>::value, "Class must be derived from AbstractCpmCommand");
+            bool result = registeredCommand.insert(make_pair(commandID, [] (vector<string> args) -> shared_ptr<AbstractCpmCommand> {
+                return unpack_vector::make_shared<T,ArgsNumber>(args);
+            })).second;
+            if (result == false) throw invalid_argument("A CpmCommand is already registered with this id : \""+to_string(commandID) +"\"");
+            return commandID;
+        }
         
 
     protected:
 
         bool isDialoguing;
         map<string,weak_ptr<AbstractCpmCommand>> pendingRequests;
-
-        virtual void sendResponse(shared_ptr<AbstractCpmCommand> cpmCommand);
 
         template <typename... Args>
         shared_ptr<AbstractCpmCommand> createCommand(uint commandID, vector<string> argsVect);
@@ -68,7 +87,6 @@ class CpmDialog {
         shared_ptr<IUIDGenerator> mUIDGenerator;
         chrono::milliseconds mRefreshPeriod;
         chrono::milliseconds mRequestTimeout;
-
 };
 
 #endif

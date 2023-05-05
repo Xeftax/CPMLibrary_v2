@@ -1,4 +1,5 @@
 #include <cxxtest/TestSuite.h>
+#include <memory>
 #include "cpmrequest.h"
 #include "cpmdialog.h"
 #include "cpmdialogtest.h"
@@ -20,7 +21,9 @@ class debugTestSuite : public CxxTest::TestSuite {
             shared_ptr<TestDialogQueue> receiverQueue = make_shared<TestDialogQueue>();
             CpmDialog cpmdialog1(senderQueue,receiverQueue,make_shared<TestRequestCoder>(),make_shared<TestUIDGenerator>());
             CpmDialog cpmdialog2(receiverQueue,senderQueue,make_shared<TestRequestCoder>(),make_shared<TestUIDGenerator>());
-            shared_ptr<Select> request = cpmdialog1.sendRequest<Select>("babine");
+            string folderName = "babine";
+            shared_ptr<Select> request = make_shared<Select>(folderName);
+            cpmdialog1.sendRequest(request);
             cout << request->response() << endl;
         }
 };

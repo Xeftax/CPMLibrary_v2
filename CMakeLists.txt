@@ -7,7 +7,7 @@ file(GLOB CPP_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 
 add_library(CPMMessageStorage ${CPP_FILES} ${CPP_HEADERS})
 target_include_directories(CPMMessageStorage PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/include)
-set_property(TARGET CPMMessageStorage PROPERTY CXX_STANDARD 17)
+set_property(TARGET CPMMessageStorage PROPERTY CXX_STANDARD 20)
 target_link_libraries(CPMMessageStorage log4cxx)
 
 set(CMAKE_CXX_STANDARD 20)
