@@ -2,8 +2,7 @@
 #include <memory>
 #include "cpmrequest.h"
 #include "cpmdialog.h"
-#include "cpmdialogtest.h"
-
+#include "cpmdialogexample.h"
 
 class debugTestSuite : public CxxTest::TestSuite {
 
@@ -17,10 +16,10 @@ class debugTestSuite : public CxxTest::TestSuite {
         }
 
         void testDebug(void) {
-            shared_ptr<TestDialogQueue> senderQueue = make_shared<TestDialogQueue>();
-            shared_ptr<TestDialogQueue> receiverQueue = make_shared<TestDialogQueue>();
-            CpmDialog cpmdialog1(senderQueue,receiverQueue,make_shared<TestRequestCoder>(),make_shared<TestUIDGenerator>());
-            CpmDialog cpmdialog2(receiverQueue,senderQueue,make_shared<TestRequestCoder>(),make_shared<TestUIDGenerator>());
+            shared_ptr<DialogQueueExample> senderQueue = make_shared<DialogQueueExample>();
+            shared_ptr<DialogQueueExample> receiverQueue = make_shared<DialogQueueExample>();
+            CpmDialog cpmdialog1(senderQueue,receiverQueue,make_shared<RequestCoderExample>(),make_shared<UIDGeneratorExample>());
+            CpmDialog cpmdialog2(receiverQueue,senderQueue,make_shared<RequestCoderExample>(),make_shared<UIDGeneratorExample>());
             cpmdialog1.startDialog();
             cpmdialog2.startDialog();
             string folderName = "babine";

@@ -62,6 +62,7 @@ class CpmDialog {
 
         template<typename CpmCommand>
         void sendRequest(shared_ptr<CpmCommand> cpmCommand) {
+            static_assert(is_base_of<AbstractCpmCommand, CpmCommand>::value, "Class must be derived from AbstractCpmCommand");
             vector<string> request = cpmCommand->request()->toStringVector();
             vector<string> requestUID = {mUIDGenerator->getNewUID(),to_string(CpmCommand::registrationID)};
             request.insert(request.begin(),requestUID.begin(),requestUID.end());
@@ -72,7 +73,7 @@ class CpmDialog {
                 this_thread::sleep_for(mRefreshPeriod);
                 requestTimeout += -mRefreshPeriod;
             }
-            if (requestTimeout <= chrono::milliseconds(0)) throw "";
+            if (requestTimeout <= chrono::milliseconds(0)) throw runtime_error("Request timeout");
         }
 
         template<typename CpmCommand, typename... Args>
@@ -99,8 +100,6 @@ class CpmDialog {
         thread listening_thread;
         map<string,weak_ptr<AbstractCpmCommand>> pendingRequests;
 
-        template <typename... Args>
-        shared_ptr<AbstractCpmCommand> createCommand(uint commandID, vector<string> argsVect);
         static map<uint, function<shared_ptr<AbstractCpmCommand>(vector<string>)>> registeredCommand;
 
         shared_ptr<IDialogQueue> mSenderQueue;

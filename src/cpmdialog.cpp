@@ -32,7 +32,10 @@ void CpmDialog::startDialog() {
                 if (shared_ptr<AbstractCpmCommand> pendingRequest = pendingRequestIterator->second.lock())
                     pendingRequest->response()->fromStringVector(vector<string> {message.begin() + 1, message.end()});
             } else {
-                shared_ptr<AbstractCpmCommand> request = createCommand(stoul(message[1]), vector<string>(message.begin() + 2, message.end()));
+                auto createFuncIterator = registeredCommand.find(stoul(message[1]));
+                if (createFuncIterator == registeredCommand.end()) 
+                    throw range_error("There is no concrete CpmCommand registered in CpmDialog with the id : \""+to_string(stoul(message[1])) +"\"");
+                shared_ptr<AbstractCpmCommand> request = createFuncIterator->second(vector<string>(message.begin() + 2, message.end()));
                 request->execute();
                 vector<string> response = request->response()->toStringVector();
                 response.insert(response.begin(),messageUID);
@@ -49,14 +52,6 @@ void CpmDialog::stopDialog() {
     if (listening_thread.joinable()) {
         listening_thread.join();
     }
-}
-
-template <typename... Args>
-shared_ptr<AbstractCpmCommand> CpmDialog::createCommand(uint commandID, vector<string> argsVect) {  
-    auto createFuncIterator = registeredCommand.find(commandID);
-    if (createFuncIterator == registeredCommand.end()) 
-        throw range_error("There is no concrete CpmCommand registered in CpmDialog with the id : \""+to_string(commandID) +"\"");
-    return createFuncIterator->second(argsVect);
 }
 
 map<uint, function<shared_ptr<AbstractCpmCommand>(vector<string>)>> CpmDialog::registeredCommand;

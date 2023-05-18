@@ -4,7 +4,7 @@
 #include "cpmdialog.h"
 #include <deque>
 
-class TestDialogQueue : public IDialogQueue {
+class DialogQueueExample : public IDialogQueue {
     public:
         virtual string pop();
         virtual void add(string message);
@@ -13,13 +13,13 @@ class TestDialogQueue : public IDialogQueue {
         deque<string> mQueue;
 };
 
-class TestRequestCoder : public IRequestCoder {
+class RequestCoderExample : public IRequestCoder {
     public :
         virtual string code(vector<string> message);
         virtual vector<string> decode(string message);
 };
 
-class TestUIDGenerator : public IUIDGenerator {
+class UIDGeneratorExample : public IUIDGenerator {
     public:
         virtual string getNewUID();
 };

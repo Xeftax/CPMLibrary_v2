@@ -1,23 +1,23 @@
-#include "cpmdialogtest.h"
+#include "cpmdialogexample.h"
 #include <random>
 #include <iomanip>
 #include <sstream>
 
-string TestDialogQueue::pop() { 
+string DialogQueueExample::pop() { 
     string result = mQueue.front();
     mQueue.pop_front();
     return result;
 }
-void TestDialogQueue::add(string message) { mQueue.push_back(message); }
-bool TestDialogQueue::isEmpty() { return mQueue.empty(); }
+void DialogQueueExample::add(string message) { mQueue.push_back(message); }
+bool DialogQueueExample::isEmpty() { return mQueue.empty(); }
 
 
-string TestRequestCoder::code(vector<string> message) {
+string RequestCoderExample::code(vector<string> message) {
     stringstream ss;
     for (const auto& msg : message) { ss << msg.length() << ':' << msg;}
     return ss.str();
 }
-vector<string> TestRequestCoder::decode(string message) {
+vector<string> RequestCoderExample::decode(string message) {
     vector<string> result;
     size_t i = 0;
     while (i < message.length()) {
@@ -32,7 +32,7 @@ vector<string> TestRequestCoder::decode(string message) {
     return result;
 }
 
-string TestUIDGenerator::getNewUID() {
+string UIDGeneratorExample::getNewUID() {
     static random_device rd;
     static mt19937 gen(rd());
     static uniform_int_distribution<> dis(0, 255);
@@ -47,3 +47,4 @@ string TestUIDGenerator::getNewUID() {
     uuid.insert(23, "-");
     return uuid;
 }
+
