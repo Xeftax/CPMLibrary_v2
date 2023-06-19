@@ -31,8 +31,8 @@ class AbstractCpmCommand {
         virtual Response* response() = 0; 
         virtual void execute() = 0;
 
-        static uint registrationID;
-        uint getRegistrationID();
+        static std::string registrationID;
+        virtual std::string getRegistrationID() = 0;
 };
 
 class Select : public AbstractCpmCommand {
@@ -40,7 +40,7 @@ class Select : public AbstractCpmCommand {
         Select(std::string& folderName);
 
         struct Request : AbstractCpmCommand::Request {
-            std::string folderName;
+            std::string folderName = "";
             virtual std::vector<std::string> toStringVector();
             virtual void fromStringVector(std::vector<std::string> response);
 
@@ -57,7 +57,8 @@ class Select : public AbstractCpmCommand {
         virtual Response* response();
         virtual void execute();
 
-        static uint registrationID;
+        static std::string registrationID;
+        virtual std::string getRegistrationID();
 
     protected:
         Request mRequest;

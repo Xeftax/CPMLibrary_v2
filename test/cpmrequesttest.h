@@ -15,11 +15,11 @@ class CpmRequestTestSuite : public CxxTest::TestSuite {
         void testSelectConstruct(void) {
             TS_ASSERT_EQUALS(select->request()->folderName, utf8Chars);
             TS_ASSERT_EQUALS(select->response()->status, AbstractCpmCommand::Result::NONE);
-            TS_ASSERT_EQUALS(select->response()->UIDVALIDITY, NULL);
-            TS_ASSERT_EQUALS(select->response()->nextUID, NULL);
-            TS_ASSERT_EQUALS(Select::registrationID, 1);
-            TS_ASSERT_EQUALS(select->registrationID, 1);
-            TS_ASSERT_EQUALS(select->getRegistrationID(), 1);
+            TS_ASSERT_EQUALS(select->response()->UIDVALIDITY, 0);
+            TS_ASSERT_EQUALS(select->response()->nextUID, 0);
+            TS_ASSERT_EQUALS(Select::registrationID, "SELECT");
+            TS_ASSERT_EQUALS(select->registrationID, "SELECT");
+            TS_ASSERT_EQUALS(select->getRegistrationID(), "SELECT");
             
         }
 

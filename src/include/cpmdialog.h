@@ -2,13 +2,8 @@
 #define CPM_DIALOG
 
 #include "cpmrequest.h"
-#include <cstddef>
 #include <memory>
-#include <chrono>
-#include <set>
 #include <map>
-#include <vector>
-#include <functional>
 #include <chrono>
 #include <thread>
 
@@ -60,36 +55,22 @@ class CpmDialog {
         virtual void startDialog();
         virtual void stopDialog();
 
-        template<typename CpmCommand>
-        void sendRequest(std::shared_ptr<CpmCommand> cpmCommand) {
-            static_assert(std::is_base_of<AbstractCpmCommand, CpmCommand>::value, "Class must be derived from AbstractCpmCommand");
-            std::vector<std::string> request = cpmCommand->request()->toStringVector();
-            std::vector<std::string> requestUID = {mUIDGenerator->getNewUID(),std::to_string(CpmCommand::registrationID)};
-            request.insert(request.begin(),requestUID.begin(),requestUID.end());
-            mSenderQueue->add(mRequestCoder->code(request));
-            pendingRequests.insert(make_pair(requestUID.front(), cpmCommand));
-            std::chrono::milliseconds requestTimeout = mRequestTimeout;
-            while (cpmCommand->response()->status == AbstractCpmCommand::Result::NONE && requestTimeout > std::chrono::milliseconds(0)) {
-                std::this_thread::sleep_for(mRefreshPeriod);
-                requestTimeout += -mRefreshPeriod;
-            }
-            if (requestTimeout <= std::chrono::milliseconds(0)) throw std::runtime_error("Request timeout");
-        }
+        virtual void sendRequest(std::shared_ptr<AbstractCpmCommand> cpmCommand);
 
         template<typename CpmCommand, typename... Args>
         std::shared_ptr<CpmCommand> sendRequest(Args&&... args) {
             std::shared_ptr<CpmCommand> cpmRequest = std::make_shared<CpmCommand>(std::forward<Args>(args)...);
-            sendRequest<CpmCommand>(cpmRequest);
+            sendRequest(cpmRequest);
             return cpmRequest;
         }
 
         template<typename T, size_t ArgsNumber>
-        static uint commandRegister(uint commandID) {
+        static std::string commandRegister(std::string commandID) {
             static_assert(std::is_base_of<AbstractCpmCommand, T>::value, "Class must be derived from AbstractCpmCommand");
             bool result = registeredCommand.insert(std::make_pair(commandID, [] (std::vector<std::string> args) -> std::shared_ptr<AbstractCpmCommand> {
                 return unpack_vector::make_shared<T,ArgsNumber>(args);
             })).second;
-            if (result == false) throw std::invalid_argument("A CpmCommand is already registered with this id : \""+std::to_string(commandID) +"\"");
+            if (result == false) throw std::invalid_argument("A CpmCommand is already registered with this id : \""+commandID+"\"");
             return commandID;
         }
         
@@ -100,7 +81,7 @@ class CpmDialog {
         std::thread listening_thread;
         std::map<std::string,std::weak_ptr<AbstractCpmCommand>> pendingRequests;
 
-        static std::map<uint, std::function<std::shared_ptr<AbstractCpmCommand>(std::vector<std::string>)>> registeredCommand;
+        static std::map<std::string, std::function<std::shared_ptr<AbstractCpmCommand>(std::vector<std::string>)>> registeredCommand;
 
         std::shared_ptr<IDialogQueue> mSenderQueue;
         std::shared_ptr<IDialogQueue> mReceiverQueue;

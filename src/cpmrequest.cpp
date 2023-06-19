@@ -1,15 +1,9 @@
 #include "cpmrequest.h"
 #include "cpmdialog.h"
-#include <array>
-#include <cstdint>
-#include <numeric>
-#include <stdexcept>
-#include <string>
-#include <type_traits>
-#include <vector>
 
-uint AbstractCpmCommand::registrationID = 0;
-uint AbstractCpmCommand::getRegistrationID() { return registrationID;}
+//AbstractCpmCommand
+
+std::string AbstractCpmCommand::registrationID = "";
 
 std::vector<std::string> AbstractCpmCommand::Request::toStringVector() { return std::vector<std::string>();}
 
@@ -24,8 +18,11 @@ void AbstractCpmCommand::Response::fromStringVector(std::vector<std::string> res
     status = static_cast<Result>(std::stoi(response[0]));
 }
 
+//Select
+
 Select::Select(std::string& folderName) { mRequest.folderName = folderName; }
-uint Select::registrationID = CpmDialog::commandRegister<Select,1>(1) ;
+std::string Select::registrationID = CpmDialog::commandRegister<Select,1>("SELECT");
+std::string Select::getRegistrationID() { return registrationID;}
 
 std::vector<std::string> Select::Request::toStringVector() {
     std::vector<std::string> request = AbstractCpmCommand::Request::toStringVector();

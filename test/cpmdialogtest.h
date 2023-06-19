@@ -21,7 +21,7 @@ class CpmDialogTestSuite : public CxxTest::TestSuite {
             senderCpmDialog->startDialog();
             recieverCpmDialog->startDialog();
             std::shared_ptr<Select> request = std::make_shared<Select>(utf8Chars);
-            senderCpmDialog->sendRequest<Select>(request);
+            senderCpmDialog->sendRequest(request);
             TS_ASSERT_EQUALS(request->response()->status, AbstractCpmCommand::Result::OK);
             TS_ASSERT_EQUALS(request->response()->UIDVALIDITY, 765897);
             TS_ASSERT_EQUALS(request->response()->nextUID, 345);
