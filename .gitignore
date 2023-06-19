@@ -1,6 +1,4 @@
-/.DS_Store
+.DS_Store
 /.vscode
 /build
-/server syntax
-/test.dSYM
-/.cache
+/test*.

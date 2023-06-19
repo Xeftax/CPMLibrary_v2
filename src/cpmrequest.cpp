@@ -11,43 +11,46 @@
 uint AbstractCpmCommand::registrationID = 0;
 uint AbstractCpmCommand::getRegistrationID() { return registrationID;}
 
-vector<string> AbstractCpmCommand::Request::toStringVector() { return vector<string>();}
+std::vector<std::string> AbstractCpmCommand::Request::toStringVector() { return std::vector<std::string>();}
 
-void AbstractCpmCommand::Request::fromStringVector(vector<string> response) { return; }
+void AbstractCpmCommand::Request::fromStringVector(std::vector<std::string> response) { return; }
 
-vector<string> AbstractCpmCommand::Response::toStringVector() {
-    return vector<string> {to_string(static_cast<int>(status))};
+std::vector<std::string> AbstractCpmCommand::Response::toStringVector() {
+    return std::vector<std::string> {std::to_string(static_cast<int>(status))};
 }
 
-void AbstractCpmCommand::Response::fromStringVector(vector<string> response) {
-    status = static_cast<Result>(stoi(response[0]));
+void AbstractCpmCommand::Response::fromStringVector(std::vector<std::string> response) {
+    if (response.size() < 1) throw std::runtime_error("Invalid response size (expected >= 1)");
+    status = static_cast<Result>(std::stoi(response[0]));
 }
 
-Select::Select(string& folderName) { mRequest.folderName = folderName; }
+Select::Select(std::string& folderName) { mRequest.folderName = folderName; }
 uint Select::registrationID = CpmDialog::commandRegister<Select,1>(1) ;
 
-vector<string> Select::Request::toStringVector() {
-    vector<string> request = AbstractCpmCommand::Request::toStringVector();
+std::vector<std::string> Select::Request::toStringVector() {
+    std::vector<std::string> request = AbstractCpmCommand::Request::toStringVector();
     request.push_back(folderName);
     return request;
 }
 
-void Select::Request::fromStringVector(vector<string> response) {
+void Select::Request::fromStringVector(std::vector<std::string> response) {
+    if (response.size() < 1) throw std::runtime_error("Invalid response size (expected >= 1)");
     AbstractCpmCommand::Request::fromStringVector(response);
     folderName = response[0];
 }
 
-vector<string> Select::Response::toStringVector() {
-    vector<string> response = AbstractCpmCommand::Response::toStringVector();
-    response.push_back(to_string(UIDVALIDITY));
-    response.push_back(to_string(nextUID));
+std::vector<std::string> Select::Response::toStringVector() {
+    std::vector<std::string> response = AbstractCpmCommand::Response::toStringVector();
+    response.push_back(std::to_string(UIDVALIDITY));
+    response.push_back(std::to_string(nextUID));
     return response;
 }
 
-void Select::Response::fromStringVector(vector<string> response) {
+void Select::Response::fromStringVector(std::vector<std::string> response) {
+    if (response.size() < 3) throw std::runtime_error("Invalid response size (expected >= 3)");
     AbstractCpmCommand::Response::fromStringVector(response);
-    UIDVALIDITY = stoul(response[1]);
-    nextUID = stoul(response[2]);
+    UIDVALIDITY = std::stoul(response[1]);
+    nextUID = std::stoul(response[2]);
 }
 
 Select::Request* Select::request() {

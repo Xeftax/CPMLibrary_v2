@@ -5,8 +5,6 @@
 #include <string>
 #include <vector>
 
-using namespace std;
-
 class AbstractCpmCommand {
     
     public:
@@ -19,14 +17,14 @@ class AbstractCpmCommand {
         };
 
         struct Request {
-            virtual vector<string> toStringVector();
-            virtual void fromStringVector(vector<string> response);
+            virtual std::vector<std::string> toStringVector();
+            virtual void fromStringVector(std::vector<std::string> response);
         };
 
         struct Response {
             Result status = Result::NONE;
-            virtual vector<string> toStringVector();
-            virtual void fromStringVector(vector<string> response);
+            virtual std::vector<std::string> toStringVector();
+            virtual void fromStringVector(std::vector<std::string> response);
         };
 
         virtual Request* request() = 0;
@@ -39,20 +37,20 @@ class AbstractCpmCommand {
 
 class Select : public AbstractCpmCommand {
     public:
-        Select(string& folderName);
+        Select(std::string& folderName);
 
         struct Request : AbstractCpmCommand::Request {
-            string folderName;
-            virtual vector<string> toStringVector();
-            virtual void fromStringVector(vector<string> response);
+            std::string folderName;
+            virtual std::vector<std::string> toStringVector();
+            virtual void fromStringVector(std::vector<std::string> response);
 
         };
 
         struct Response : AbstractCpmCommand::Response {
-            uint32_t UIDVALIDITY;
-            uint32_t nextUID;
-            virtual vector<string> toStringVector();
-            virtual void fromStringVector(vector<string> response);
+            uint32_t UIDVALIDITY = 0;
+            uint32_t nextUID = 0;
+            virtual std::vector<std::string> toStringVector();
+            virtual void fromStringVector(std::vector<std::string> response);
         };
 
         virtual Request* request();
@@ -61,7 +59,7 @@ class Select : public AbstractCpmCommand {
 
         static uint registrationID;
 
-    private:
+    protected:
         Request mRequest;
         Response mResponse;
 };

@@ -6,22 +6,22 @@
 
 class DialogQueueExample : public IDialogQueue {
     public:
-        virtual string pop();
-        virtual void add(string message);
+        virtual std::string pop();
+        virtual void add(std::string message);
         virtual bool isEmpty();
     private:
-        deque<string> mQueue;
+        std::deque<std::string> mQueue;
 };
 
 class RequestCoderExample : public IRequestCoder {
     public :
-        virtual string code(vector<string> message);
-        virtual vector<string> decode(string message);
+        virtual std::string code(std::vector<std::string> message);
+        virtual std::vector<std::string> decode(std::string message);
 };
 
 class UIDGeneratorExample : public IUIDGenerator {
     public:
-        virtual string getNewUID();
+        virtual std::string getNewUID();
 };
 
 #endif
