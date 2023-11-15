@@ -1,22 +1,26 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.0.0...3.5)
 project(CPMMessageStorage VERSION 0.1.0)
 
+set(CMAKE_PREFIX_PATH /opt/homebrew/)
 find_package( log4cxx REQUIRED )
 
 set(CMAKE_CXX_STANDARD 17)
 
-file(GLOB CPP_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/include/*.h ${CMAKE_CURRENT_SOURCE_DIR}/example/include/*.h)
+#define log path
+set(CPM_LOG_PATH ${CMAKE_CURRENT_BINARY_DIR}/logs)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/include/logmanager.h.in ${CPM_LOG_PATH}/logmanager.h)
+
+file(GLOB CPP_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/include/*.h ${CMAKE_CURRENT_SOURCE_DIR}/example/include/*.h ${CPM_LOG_PATH}/logmanager.h)
 file(GLOB CPP_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/example/*.cpp)
 
 add_library(CPMMessageStorage ${CPP_FILES} ${CPP_HEADERS})
-target_include_directories(CPMMessageStorage PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/include ${CMAKE_CURRENT_SOURCE_DIR}/example/include)
+target_include_directories(CPMMessageStorage PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/include ${CMAKE_CURRENT_SOURCE_DIR}/example/include ${CPM_LOG_PATH})
 target_link_libraries(CPMMessageStorage log4cxx)
 
-find_package(CxxTest )
+find_package(CxxTest)
 if(CXXTEST_FOUND)
     include_directories(${CXXTEST_INCLUDE_DIR})
     enable_testing()
-
     file(GLOB TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test/*.h)
     set(TEST_REPORTS ${CMAKE_CURRENT_BINARY_DIR}/test/reports)
     file(MAKE_DIRECTORY ${TEST_REPORTS})

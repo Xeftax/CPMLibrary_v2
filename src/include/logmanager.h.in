@@ -1,0 +1,18 @@
+#ifndef LOG_MANAGER
+#define LOG_MANAGER
+
+#define CPM_LOG_PATH "@CPM_LOG_PATH@"
+
+#include <log4cxx/logger.h>
+
+namespace cpm {
+
+class LogManager {
+public:
+	static bool setupLogger();
+
+};
+
+} // namespace cpm
+
+#endif // LOG_MANAGER

@@ -1,8 +1,10 @@
-#ifndef CPM_DIALOG_TEST
-#define CPM_DIALOG_TEST
+#ifndef CPM_DIALOG_EXAMPLE
+#define CPM_DIALOG_EXAMPLE
 
-#include "cpmdialog.h"
+#include "dialog.h"
 #include <deque>
+
+namespace cpm {
 
 class DialogQueueExample : public IDialogQueue {
     public:
@@ -24,4 +26,6 @@ class UIDGeneratorExample : public IUIDGenerator {
         virtual std::string getNewUID();
 };
 
-#endif
+} // namespace cpm
+
+#endif // CPM_DIALOG_EXAMPLE

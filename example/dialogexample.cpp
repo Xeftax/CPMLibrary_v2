@@ -1,14 +1,15 @@
-#include "cpmdialogexample.h"
+#include "dialogexample.h"
 #include <random>
 #include <iomanip>
 #include <sstream>
+
+using namespace cpm;
 
 std::string DialogQueueExample::pop() { 
     std::string result = mQueue.front();
     mQueue.pop_front();
     return result;
 }
-//utf-8 string 
 void DialogQueueExample::add(std::string message) { mQueue.push_back(message); }
 bool DialogQueueExample::isEmpty() { return mQueue.empty(); }
 
