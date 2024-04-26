@@ -1,7 +1,6 @@
 #ifndef CPM_MESSAGE
 #define CPM_MESSAGE
 
-#include "headers.h"
 #include "dialog.h"
 #include "object.h"
 #include <cstdint>

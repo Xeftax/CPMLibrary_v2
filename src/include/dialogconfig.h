@@ -8,26 +8,27 @@
 
 namespace cpm {
 
-class StorageUnit;
-class IDialogQueue;
-class IRequestCoder;
-class IUIDGenerator;
+    class StorageUnit;
+    class IDialogQueue;
+    class IRequestCoder;
+    class IUIDGenerator;
 
-struct DialogConfiguration {
-    const std::shared_ptr<StorageUnit> storageFolder;
-    const std::shared_ptr<IDialogQueue> senderQueue;
-    const std::shared_ptr<IDialogQueue> receiverQueue;
-    const std::shared_ptr<IRequestCoder> requestCoder;
-    const std::shared_ptr<IUIDGenerator> uidGenerator;
-    const std::chrono::milliseconds refreshPeriod;
-    const std::chrono::milliseconds requestTimeout;
-};
+    struct DialogConfiguration {
+        const std::shared_ptr<StorageUnit> storageFolder;
+        const std::shared_ptr<IDialogQueue> senderQueue;
+        const std::shared_ptr<IDialogQueue> receiverQueue;
+        const std::shared_ptr<IRequestCoder> requestCoder;
+        const std::shared_ptr<IUIDGenerator> uidGenerator;
+        const std::chrono::milliseconds refreshPeriod;
+        const std::chrono::milliseconds requestTimeout;
+    };
 
-struct LocalBackupConfiguration {
-    static std::shared_ptr<StorageUnit> setup(const std::string& path); 
-private:
-    static log4cxx::LoggerPtr logger;
-};
+    class LocalBackupConfiguration {
+    public:
+        static std::shared_ptr<StorageUnit> setup(const std::string& path);
+    private:
+        static log4cxx::LoggerPtr logger;
+    };
 
 } // namespace cpm
 

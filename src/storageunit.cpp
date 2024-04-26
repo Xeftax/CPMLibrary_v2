@@ -43,13 +43,21 @@ const Identifier StorageUnit::getNextUID() {
     return Identifier(uid, identifier.uidValidity, "");
 }
 
-void cpm::StorageUnit::create(const std::string& name) {
-    const Select::Response* selectResponse = communicationGateway->sendRequest<Select>(defaultFolder)->response();
-    if (selectResponse->status != Select::Result::OK) {
-        throw std::runtime_error("Error selecting default folder");
+std::shared_ptr<cpm::ConversationHistory> cpm::StorageUnit::create(const std::string& name) {
+    if (communicationGateway == nullptr) {
+        throw std::runtime_error("Error creating folder: no communication gateway");
     }
-    const Create::Response* createResponse = communicationGateway->sendRequest<Create>(name)->response();
-    if (createResponse->status != Create::Result::OK) {
+    std::shared_ptr<Select> selectRootFolder = communicationGateway->sendRequest<Select>(defaultFolder);
+    if (selectRootFolder->response()->status != Select::Result::OK) {
+        throw std::runtime_error("Error selecting default folder: " + defaultFolder);
+    }
+    std::shared_ptr<Create> createFolder = communicationGateway->sendRequest<Create>(name);
+    if (createFolder->response()->status != Create::Result::OK) {
         throw std::runtime_error("Error creating folder");
     }
+    std::shared_ptr<Select> selectNewFolder = communicationGateway->sendRequest<Select>(name);
+    if (selectNewFolder->response()->status != Select::Result::OK) {
+        throw std::runtime_error("Error selecting new folder");
+    }
+    //return std::make_shared<ConversationHistory>(name, communicationGateway, getNextUID());
 }
